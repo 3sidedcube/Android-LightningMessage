@@ -46,7 +46,7 @@ public class MessageSettings
 	/**
 	 * Project number as defined in the Google console project page under "project number"
 	 */
-	@Getter private String projectNumber = "";
+	@Getter private String projectNumber;
 
 	/**
 	 * Callback used once the device has been registered for a push token
