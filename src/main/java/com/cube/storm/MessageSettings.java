@@ -2,6 +2,8 @@ package com.cube.storm;
 
 import android.content.Context;
 
+import com.cube.storm.message.lib.listener.RegisterListener;
+
 import lombok.Getter;
 
 /**
@@ -47,6 +49,11 @@ public class MessageSettings
 	@Getter private String projectNumber = "";
 
 	/**
+	 * Callback used once the device has been registered for a push token
+	 */
+	@Getter private RegisterListener registerListener;
+
+	/**
 	 * The builder class for {@link com.cube.storm.MessageSettings}. Use this to create a new {@link com.cube.storm.MessageSettings} instance
 	 * with the customised properties specific for your project.
 	 *
@@ -80,6 +87,19 @@ public class MessageSettings
 		public Builder projectNumber(String projectNumber)
 		{
 			construct.projectNumber = projectNumber;
+			return this;
+		}
+
+		/**
+		 * Sets the callback listener for when the device has been registered for a push token
+		 *
+		 * @param listener The listener to use
+		 *
+		 * @return The builder to allow for chaining
+		 */
+		public Builder registerListener(RegisterListener listener)
+		{
+			construct.registerListener = listener;
 			return this;
 		}
 
