@@ -2,6 +2,8 @@ package com.cube.storm;
 
 import android.content.Context;
 
+import lombok.Getter;
+
 /**
  * This is the entry point class of the library. To enable the use of the library, you must instantiate
  * a new {@link com.cube.storm.MessageSettings.Builder} object in your {@link android.app.Application} singleton class.
@@ -40,6 +42,11 @@ public class MessageSettings
 	private MessageSettings(){}
 
 	/**
+	 * Project number as defined in the Google console project page under "project number"
+	 */
+	@Getter private String projectNumber = "";
+
+	/**
 	 * The builder class for {@link com.cube.storm.MessageSettings}. Use this to create a new {@link com.cube.storm.MessageSettings} instance
 	 * with the customised properties specific for your project.
 	 *
@@ -61,6 +68,19 @@ public class MessageSettings
 		{
 			this.construct = new MessageSettings();
 			this.context = context.getApplicationContext();
+		}
+
+		/**
+		 * Sets the project number from the console
+		 *
+		 * @param projectNumber The project number
+		 *
+		 * @return The builder to allow for chaining
+		 */
+		public Builder projectNumber(String projectNumber)
+		{
+			construct.projectNumber = projectNumber;
+			return this;
 		}
 
 		/**
