@@ -1,4 +1,4 @@
-package com.cube.storm.message.lib;
+package com.cube.storm.message.lib.receiver;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -7,6 +7,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -102,6 +105,21 @@ public class GCMReceiver extends BroadcastReceiver
 
 			Builder builder = new Builder(getContext());
 			builder.setContentIntent(PendingIntent.getActivity(getContext(), 0, startingIntent, PendingIntent.FLAG_CANCEL_CURRENT));
+
+			ApplicationInfo ai;
+			PackageManager pm = context.getPackageManager();
+			try
+			{
+				ai = pm.getApplicationInfo(context.getPackageName(), 0);
+			}
+			catch (final NameNotFoundException e)
+			{
+				ai = null;
+			}
+
+			String applicationName = (ai != null ? String.valueOf(pm.getApplicationLabel(ai)) : "(unknown)");
+			builder.setContentTitle(applicationName);
+
 			builder.setTicker(message);
 			builder.setContentText(message);
 			builder.setStyle(style);
@@ -123,7 +141,13 @@ public class GCMReceiver extends BroadcastReceiver
 	 *
 	 * @param token The token of the push device
 	 */
-	public void registerCallback(@Nullable String token){}
+	public void registerCallback(@Nullable String token)
+	{
+		if (MessageSettings.getInstance().getRegisterListener() != null)
+		{
+			MessageSettings.getInstance().getRegisterListener().onDeviceRegistered(getContext(), token);
+		}
+	}
 
 	/**
 	 * Registers a device for a push token. This method executes an AsyncTask which will run in the background.
