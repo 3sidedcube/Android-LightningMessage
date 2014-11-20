@@ -8,6 +8,7 @@ import com.cube.storm.message.lib.listener.RegisterListener;
 import com.cube.storm.message.lib.receiver.MessageReceiver;
 
 import lombok.Getter;
+import lombok.Setter;
 
 /**
  * This is the entry point class of the library. To enable the use of the library, you must instantiate
@@ -49,17 +50,17 @@ public class MessageSettings
 	/**
 	 * Project number as defined in the Google console project page under "project number"
 	 */
-	@Getter private String projectNumber;
+	@Getter @Setter private String projectNumber;
 
 	/**
 	 * Callback used once the device has been registered for a push token
 	 */
-	@Getter private RegisterListener registerListener;
+	@Getter @Setter private RegisterListener registerListener;
 
 	/**
 	 * The gcm receiver class used to receive messages from Storm.
 	 */
-	@Getter private MessageReceiver receiver;
+	@Getter @Setter private MessageReceiver receiver;
 
 	/**
 	 * The builder class for {@link com.cube.storm.MessageSettings}. Use this to create a new {@link com.cube.storm.MessageSettings} instance
