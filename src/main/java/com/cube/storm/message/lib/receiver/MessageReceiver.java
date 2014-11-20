@@ -21,6 +21,7 @@ import android.text.TextUtils;
 
 import com.cube.storm.MessageSettings;
 import com.cube.storm.message.R;
+import com.cube.storm.util.lib.debug.Debug;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import java.io.IOException;
@@ -30,7 +31,15 @@ import java.util.Set;
 
 import lombok.Getter;
 
-public class GCMReceiver extends BroadcastReceiver
+/**
+ * Receiver class for receiving messages from Storm CMS.
+ * <p/>
+ * Override this class to handle messages sent via storm
+ *
+ * @author Callum Taylor
+ * @project LightningMessage
+ */
+public class MessageReceiver extends BroadcastReceiver
 {
 	/**
 	 * List of previously sent notification IDs to prevent duplicates from being shown

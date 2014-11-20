@@ -3,6 +3,7 @@ package com.cube.storm;
 import android.content.Context;
 
 import com.cube.storm.message.lib.listener.RegisterListener;
+import com.cube.storm.message.lib.receiver.MessageReceiver;
 
 import lombok.Getter;
 
@@ -54,6 +55,11 @@ public class MessageSettings
 	@Getter private RegisterListener registerListener;
 
 	/**
+	 * The gcm receiver class used to receive messages from Storm.
+	 */
+	@Getter private MessageReceiver receiver;
+
+	/**
 	 * The builder class for {@link com.cube.storm.MessageSettings}. Use this to create a new {@link com.cube.storm.MessageSettings} instance
 	 * with the customised properties specific for your project.
 	 *
@@ -75,6 +81,8 @@ public class MessageSettings
 		{
 			this.construct = new MessageSettings();
 			this.context = context.getApplicationContext();
+
+			messageReceiver(new MessageReceiver());
 		}
 
 		/**
@@ -100,6 +108,32 @@ public class MessageSettings
 		public Builder registerListener(RegisterListener listener)
 		{
 			construct.registerListener = listener;
+			return this;
+		}
+
+		/**
+		 * Sets the receiver for the module. You must also set this in your manifest for the framework
+		 * to use correctly.
+		 * <p/>
+		 * <pre>
+		 * &lt;receiver
+		 *	 android:name="com.cube.storm.message.lib.receiver.MessageReceiver"
+		 *	 android:permission="com.google.android.c2dm.permission.SEND"
+		 * &gt;
+		 *	 &lt;intent-filter&gt;
+		 *	 	&lt;action android:name="com.google.android.c2dm.intent.RECEIVE" /&gt;
+		 * 	 	&lt;category android:name="com.cube.storm.example" /&gt;
+		 *	 &lt;/intent-filter&gt;
+		 * &lt;/receiver&gt;
+		 * </pre>
+		 *
+		 * @param receiver The receiver to use
+		 *
+		 * @return The builder to allow for chaining
+		 */
+		public Builder messageReceiver(MessageReceiver receiver)
+		{
+			construct.receiver = receiver;
 			return this;
 		}
 
