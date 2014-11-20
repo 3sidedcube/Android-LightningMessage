@@ -1,6 +1,8 @@
 package com.cube.storm;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.cube.storm.message.lib.listener.RegisterListener;
 import com.cube.storm.message.lib.receiver.MessageReceiver;
@@ -77,7 +79,7 @@ public class MessageSettings
 		/**
 		 * Default constructor
 		 */
-		public Builder(Context context)
+		public Builder(@NonNull Context context)
 		{
 			this.construct = new MessageSettings();
 			this.context = context.getApplicationContext();
@@ -92,7 +94,7 @@ public class MessageSettings
 		 *
 		 * @return The builder to allow for chaining
 		 */
-		public Builder projectNumber(String projectNumber)
+		public Builder projectNumber(@NonNull String projectNumber)
 		{
 			construct.projectNumber = projectNumber;
 			return this;
@@ -105,7 +107,7 @@ public class MessageSettings
 		 *
 		 * @return The builder to allow for chaining
 		 */
-		public Builder registerListener(RegisterListener listener)
+		public Builder registerListener(@Nullable RegisterListener listener)
 		{
 			construct.registerListener = listener;
 			return this;
@@ -131,7 +133,7 @@ public class MessageSettings
 		 *
 		 * @return The builder to allow for chaining
 		 */
-		public Builder messageReceiver(MessageReceiver receiver)
+		public Builder messageReceiver(@Nullable MessageReceiver receiver)
 		{
 			construct.receiver = receiver;
 			return this;
