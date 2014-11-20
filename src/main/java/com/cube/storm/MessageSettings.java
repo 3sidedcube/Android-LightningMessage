@@ -81,6 +81,8 @@ public class MessageSettings
 		{
 			this.construct = new MessageSettings();
 			this.context = context.getApplicationContext();
+
+			messageReceiver(new MessageReceiver());
 		}
 
 		/**
