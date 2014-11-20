@@ -1,11 +1,14 @@
 package com.cube.storm;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.cube.storm.message.lib.listener.RegisterListener;
 import com.cube.storm.message.lib.receiver.MessageReceiver;
 
 import lombok.Getter;
+import lombok.Setter;
 
 /**
  * This is the entry point class of the library. To enable the use of the library, you must instantiate
@@ -47,17 +50,17 @@ public class MessageSettings
 	/**
 	 * Project number as defined in the Google console project page under "project number"
 	 */
-	@Getter private String projectNumber;
+	@Getter @Setter private String projectNumber;
 
 	/**
 	 * Callback used once the device has been registered for a push token
 	 */
-	@Getter private RegisterListener registerListener;
+	@Getter @Setter private RegisterListener registerListener;
 
 	/**
 	 * The gcm receiver class used to receive messages from Storm.
 	 */
-	@Getter private MessageReceiver receiver;
+	@Getter @Setter private MessageReceiver receiver;
 
 	/**
 	 * The builder class for {@link com.cube.storm.MessageSettings}. Use this to create a new {@link com.cube.storm.MessageSettings} instance
@@ -77,7 +80,7 @@ public class MessageSettings
 		/**
 		 * Default constructor
 		 */
-		public Builder(Context context)
+		public Builder(@NonNull Context context)
 		{
 			this.construct = new MessageSettings();
 			this.context = context.getApplicationContext();
@@ -92,7 +95,7 @@ public class MessageSettings
 		 *
 		 * @return The builder to allow for chaining
 		 */
-		public Builder projectNumber(String projectNumber)
+		public Builder projectNumber(@NonNull String projectNumber)
 		{
 			construct.projectNumber = projectNumber;
 			return this;
@@ -105,7 +108,7 @@ public class MessageSettings
 		 *
 		 * @return The builder to allow for chaining
 		 */
-		public Builder registerListener(RegisterListener listener)
+		public Builder registerListener(@Nullable RegisterListener listener)
 		{
 			construct.registerListener = listener;
 			return this;
@@ -131,7 +134,7 @@ public class MessageSettings
 		 *
 		 * @return The builder to allow for chaining
 		 */
-		public Builder messageReceiver(MessageReceiver receiver)
+		public Builder messageReceiver(@Nullable MessageReceiver receiver)
 		{
 			construct.receiver = receiver;
 			return this;
@@ -140,11 +143,19 @@ public class MessageSettings
 		/**
 		 * Builds the final settings object and sets its instance. Use {@link #getInstance()} to retrieve the settings
 		 * instance.
+		 * <p/>
+		 * This method will also register the receiver to the given context in {@link #Builder(android.content.Context)} if
+		 * the receiver is not null.
 		 *
 		 * @return The newly set {@link com.cube.storm.MessageSettings} instance
 		 */
 		public MessageSettings build()
 		{
+			if (construct.receiver != null)
+			{
+				construct.receiver.register(context);
+			}
+
 			return (MessageSettings.instance = construct);
 		}
 	}
