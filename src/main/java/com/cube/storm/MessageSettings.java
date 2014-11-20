@@ -140,11 +140,19 @@ public class MessageSettings
 		/**
 		 * Builds the final settings object and sets its instance. Use {@link #getInstance()} to retrieve the settings
 		 * instance.
+		 * <p/>
+		 * This method will also register the receiver to the given context in {@link #Builder(android.content.Context)} if
+		 * the receiver is not null.
 		 *
 		 * @return The newly set {@link com.cube.storm.MessageSettings} instance
 		 */
 		public MessageSettings build()
 		{
+			if (construct.receiver != null)
+			{
+				construct.receiver.register(context);
+			}
+
 			return (MessageSettings.instance = construct);
 		}
 	}
