@@ -21,7 +21,6 @@ import android.text.TextUtils;
 
 import com.cube.storm.MessageSettings;
 import com.cube.storm.message.R;
-import com.cube.storm.util.lib.debug.Debug;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import java.io.IOException;
@@ -166,6 +165,8 @@ public class MessageReceiver extends BroadcastReceiver
 	 */
 	public void register(@NonNull final Context context)
 	{
+		this.context = context;
+
 		new AsyncTask<Void, Void, String>()
 		{
 			@Override protected String doInBackground(Void... params)
