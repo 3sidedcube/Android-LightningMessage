@@ -109,7 +109,7 @@ public class MessageReceiver extends BroadcastReceiver
 			BigTextStyle style = new BigTextStyle();
 			style.bigText(message);
 
-			Intent startingIntent = new Intent();
+			Intent startingIntent = getContext().getPackageManager().getLaunchIntentForPackage(getContext().getPackageName());
 
 			Builder builder = new Builder(getContext());
 			builder.setContentIntent(PendingIntent.getActivity(getContext(), 0, startingIntent, PendingIntent.FLAG_CANCEL_CURRENT));
