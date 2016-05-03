@@ -6,7 +6,7 @@ android {
 
 	defaultConfig {
 		minSdkVersion 15
-		targetSdkVersion 21
+		targetSdkVersion 23
 	}
 
 	packagingOptions {
@@ -23,36 +23,25 @@ android {
 		exclude 'LICENSE.txt'
 	}
 
-	android {
-		lintOptions {
-			abortOnError false
-		}
+	lintOptions {
+		abortOnError false
 	}
 }
 
 dependencies {
-	compile 'com.android.support:support-annotations:23.2.1'
-	compile 'com.android.support:support-v13:23.2.1'
+	compile 'com.android.support:support-annotations:23.3.0'
+	compile 'com.android.support:support-v13:23.3.0'
 	compile 'org.projectlombok:lombok:1.14.8'
 	compile 'com.google.android.gms:play-services-gcm:8.4.0'
 
-	compile 'com.3sidedcube.storm:util:0.3-internal'
+	compile 'com.3sidedcube.storm:util:0.4.2'
 }
 
 def srcJava = 'src/main/java'
 def srcDelomboked = 'build/src-delomboked/main/java'
 
-task delombok {
-	inputs.files file(srcJava)
-	outputs.dir file(srcDelomboked)
-
-	doLast {
-		FileCollection collection = files(configurations.compile)
-		FileCollection sumTree = collection + fileTree(dir: 'bin')
-
-		ant.taskdef(name: 'delombok', classname: 'lombok.delombok.ant.DelombokTask', classpath: 'libs/lombok.jar')
-		ant.delombok(from:srcJava, to:srcDelomboked, classpath: sumTree.asPath)
-	}
+task delombok(type: Exec) {
+	commandLine 'java', '-jar', 'libs/lombok.jar', 'delombok', 'src', '-d', 'build/src-delomboked'
 }
 
 def findClasses(File path)
