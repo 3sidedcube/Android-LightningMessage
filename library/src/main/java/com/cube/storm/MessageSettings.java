@@ -1,11 +1,13 @@
 package com.cube.storm;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.cube.storm.message.lib.listener.RegisterListener;
 import com.cube.storm.message.lib.receiver.MessageReceiver;
+import com.cube.storm.message.lib.service.TokenService;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -63,6 +65,11 @@ public class MessageSettings
 	@Getter @Setter private MessageReceiver receiver;
 
 	/**
+	 * The broadcast receiver class for receiving new tokens. Should be the same as defined in the application manifest
+	 */
+	@Getter @Setter private Class<? extends TokenService> tokenService;
+
+	/**
 	 * The builder class for {@link com.cube.storm.MessageSettings}. Use this to create a new {@link com.cube.storm.MessageSettings} instance
 	 * with the customised properties specific for your project.
 	 *
@@ -86,6 +93,7 @@ public class MessageSettings
 			this.context = context.getApplicationContext();
 
 			messageReceiver(new MessageReceiver());
+			tokenService(TokenService.class);
 		}
 
 		/**
@@ -141,6 +149,24 @@ public class MessageSettings
 		}
 
 		/**
+		 * Sets the service for getting the GCM token for the module. You must also set this in your manifest for the framework
+		 * to use correctly.
+		 * <p/>
+		 * <pre>
+		 * 	<service android:name="com.cube.storm.message.lib.service.TokenService" android:exported="false" />
+		 * </pre>
+		 *
+		 * @param tokenService The service to use
+		 *
+		 * @return The builder to allow for chaining
+		 */
+		public Builder tokenService(@NonNull Class<? extends TokenService> tokenService)
+		{
+			construct.tokenService = tokenService;
+			return this;
+		}
+
+		/**
 		 * Builds the final settings object and sets its instance. Use {@link #getInstance()} to retrieve the settings
 		 * instance.
 		 * <p/>
@@ -153,9 +179,9 @@ public class MessageSettings
 		{
 			MessageSettings.instance = construct;
 
-			if (construct.receiver != null)
+			if (construct.tokenService != null)
 			{
-				construct.receiver.register(context);
+				context.startService(new Intent(context, construct.tokenService));
 			}
 
 			return construct;

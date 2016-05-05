@@ -10,20 +10,16 @@ import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat.BigTextStyle;
 import android.support.v4.app.NotificationCompat.Builder;
-import android.text.TextUtils;
 
 import com.cube.storm.MessageSettings;
 import com.cube.storm.message.R;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
-import java.io.IOException;
 import java.util.LinkedHashSet;
 import java.util.Random;
 import java.util.Set;
@@ -155,50 +151,5 @@ public class MessageReceiver extends BroadcastReceiver
 		{
 			MessageSettings.getInstance().getRegisterListener().onDeviceRegistered(getContext(), token);
 		}
-	}
-
-	/**
-	 * Registers a device for a push token. This method executes an AsyncTask which will run in the background.
-	 * Override {@link #registerCallback(String)} to handle the callback from this method.
-	 *
-	 * @param context The context to use to get the GCM instance
-	 */
-	public void register(@NonNull final Context context)
-	{
-		this.context = context;
-
-		new AsyncTask<Void, Void, String>()
-		{
-			@Override protected String doInBackground(Void... params)
-			{
-				try
-				{
-					if (TextUtils.isEmpty(MessageSettings.getInstance().getProjectNumber()))
-					{
-						throw new IllegalArgumentException("Project number can not be empty");
-					}
-
-					GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(context);
-
-					return gcm.register(MessageSettings.getInstance().getProjectNumber());
-				}
-				catch (IOException ex)
-				{
-					ex.printStackTrace();
-				}
-
-				return null;
-			}
-
-			@Override protected void onPostExecute(String result)
-			{
-				if (!TextUtils.isEmpty(result))
-				{
-					SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-					prefs.edit().putString("push_id", result).putLong("push_id_time", System.currentTimeMillis()).apply();
-					registerCallback(result);
-				}
-			}
-		}.execute(null, null, null);
 	}
 }
