@@ -1,40 +1,38 @@
 package com.cube.storm.message.lib.receiver;
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.annotation.Nullable;
-import android.support.v4.app.NotificationCompat.BigTextStyle;
-import android.support.v4.app.NotificationCompat.Builder;
 
 import com.cube.storm.MessageSettings;
-import com.cube.storm.message.R;
-import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.cube.storm.message.lib.resolver.MessageResolver;
+import com.google.android.gms.gcm.GcmListenerService;
 
 import java.util.LinkedHashSet;
-import java.util.Random;
 import java.util.Set;
 
-import lombok.Getter;
-
 /**
- * Receiver class for receiving messages from Storm CMS.
- * <p/>
- * Override this class to handle messages sent via storm
+ * Receiver class for receiving messages from Storm CMS. You should register a resolver via {@link MessageSettings#messageResolvers} using type
+ * rather than override this class.
+ * <p>
+ * Messages sent with the same "id" are ignored within the lifecycle of the application.
+ * <p>
+ * You must include this class (or subclass of this class) in your application manifest to receive notifications.
+ * <pre>
+ *	&lt;service
+ *		android:name="com.cube.storm.message.lib.receiver.MessageReceiver"
+ *		android:exported="false"
+ *	&gt;
+ *		&lt;intent-filter&gt;
+ *			&lt;action android:name="com.google.android.c2dm.intent.RECEIVE" /&gt;
+ *		&lt;/intent-filter&gt;
+ *	&lt;/service&gt;
+ * </pre>
  *
  * @author Callum Taylor
  * @project LightningMessage
  */
-public class MessageReceiver extends BroadcastReceiver
+public class MessageReceiver extends GcmListenerService
 {
 	/**
 	 * List of previously sent notification IDs to prevent duplicates from being shown
@@ -46,28 +44,12 @@ public class MessageReceiver extends BroadcastReceiver
 	 */
 	public static final String TYPE_DEFAULT = "default";
 
-	@Getter private Context context;
-
-	@Override public final void onReceive(Context context, Intent intent)
+	@Override public void onMessageReceived(String from, Bundle data)
 	{
-		this.context = context.getApplicationContext();
+		super.onMessageReceived(from, data);
 
-		GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(context);
-		String messageType = gcm.getMessageType(intent);
-
-		if (GoogleCloudMessaging.MESSAGE_TYPE_SEND_ERROR.equals(messageType))
-		{
-			// error
-		}
-		else if (GoogleCloudMessaging.MESSAGE_TYPE_DELETED.equals(messageType))
-		{
-			// deleted (??)
-		}
-		else
-		{
-			String type = intent.getExtras().getString("type");
-			handleNotification(type, intent.getExtras());
-		}
+		String type = data.getString("type");
+		handleNotification(type, data);
 	}
 
 	/**
@@ -80,7 +62,7 @@ public class MessageReceiver extends BroadcastReceiver
 	 */
 	public boolean handleNotification(String type, Bundle data)
 	{
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
 		if (prefs.contains("notifications_enabled") && !prefs.getBoolean("notifications_enabled", true))
 		{
@@ -97,59 +79,13 @@ public class MessageReceiver extends BroadcastReceiver
 			RECEIVED_IDS.add(data.getString("id"));
 		}
 
-		// default notification
-		if (TYPE_DEFAULT.equals(type))
+		MessageResolver messageResolver = MessageSettings.getInstance().getMessageResolvers().get(type);
+
+		if (messageResolver != null)
 		{
-			String message = data.getString("message");
-
-			BigTextStyle style = new BigTextStyle();
-			style.bigText(message);
-
-			Intent startingIntent = getContext().getPackageManager().getLaunchIntentForPackage(getContext().getPackageName());
-
-			Builder builder = new Builder(getContext());
-			builder.setContentIntent(PendingIntent.getActivity(getContext(), 0, startingIntent, PendingIntent.FLAG_CANCEL_CURRENT));
-
-			ApplicationInfo ai;
-			PackageManager pm = context.getPackageManager();
-			try
-			{
-				ai = pm.getApplicationInfo(context.getPackageName(), 0);
-			}
-			catch (final NameNotFoundException e)
-			{
-				ai = null;
-			}
-
-			String applicationName = (ai != null ? String.valueOf(pm.getApplicationLabel(ai)) : "(unknown)");
-			builder.setContentTitle(applicationName);
-
-			builder.setTicker(message);
-			builder.setContentText(message);
-			builder.setStyle(style);
-			builder.setSmallIcon(R.drawable.ic_notification);
-			builder.setDefaults(Notification.DEFAULT_ALL);
-            builder.setAutoCancel(true);
-
-			NotificationManager manager = (NotificationManager)getContext().getSystemService(Context.NOTIFICATION_SERVICE);
-			manager.notify(new Random().nextInt(), builder.build());
-
-			return true;
+			return messageResolver.resolve(getApplicationContext(), data);
 		}
 
 		return false;
-	}
-
-	/**
-	 * Implement this to handle registration callback
-	 *
-	 * @param token The token of the push device
-	 */
-	public void registerCallback(@Nullable String token)
-	{
-		if (MessageSettings.getInstance().getRegisterListener() != null)
-		{
-			MessageSettings.getInstance().getRegisterListener().onDeviceRegistered(getContext(), token);
-		}
 	}
 }
