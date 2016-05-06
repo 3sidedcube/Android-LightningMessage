@@ -7,7 +7,12 @@ import android.support.annotation.Nullable;
 
 import com.cube.storm.message.lib.listener.RegisterListener;
 import com.cube.storm.message.lib.receiver.MessageReceiver;
+import com.cube.storm.message.lib.resolver.DefaultMessageResolver;
+import com.cube.storm.message.lib.resolver.MessageResolver;
 import com.cube.storm.message.lib.service.TokenService;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -19,7 +24,7 @@ import lombok.Setter;
  * This class should not be directly instantiated.
  *
  * @author Callum Taylor
- * @project StormMessage
+ * @project LightningMessage
  */
 public class MessageSettings
 {
@@ -65,6 +70,11 @@ public class MessageSettings
 	@Getter @Setter private MessageReceiver receiver;
 
 	/**
+	 * List of resolvers for different types of GCM messages received
+	 */
+	@Getter private Map<String, MessageResolver> messageResolvers = new HashMap<>();
+
+	/**
 	 * The broadcast receiver class for receiving new tokens. Should be the same as defined in the application manifest
 	 */
 	@Getter @Setter private Class<? extends TokenService> tokenService;
@@ -91,6 +101,8 @@ public class MessageSettings
 		{
 			this.construct = new MessageSettings();
 			this.context = context.getApplicationContext();
+
+			registerMessageResolver(MessageReceiver.TYPE_DEFAULT, new DefaultMessageResolver());
 
 			messageReceiver(new MessageReceiver());
 			tokenService(TokenService.class);
@@ -123,19 +135,32 @@ public class MessageSettings
 		}
 
 		/**
+		 * Registers a resolver for a type of notification
+		 *
+		 * @param type The type of message received
+		 * @param resolver The handler for the receiver
+		 *
+		 * @return The builder to allow for chaining
+		 */
+		public Builder registerMessageResolver(String type, @NonNull MessageResolver resolver)
+		{
+			construct.messageResolvers.put(type, resolver);
+			return this;
+		}
+
+		/**
 		 * Sets the receiver for the module. You must also set this in your manifest for the framework
 		 * to use correctly.
 		 * <p/>
 		 * <pre>
-		 * &lt;receiver
-		 *	 android:name="com.cube.storm.message.lib.receiver.MessageReceiver"
-		 *	 android:permission="com.google.android.c2dm.permission.SEND"
-		 * &gt;
-		 *	 &lt;intent-filter&gt;
-		 *	 	&lt;action android:name="com.google.android.c2dm.intent.RECEIVE" /&gt;
-		 * 	 	&lt;category android:name="com.cube.storm.example" /&gt;
-		 *	 &lt;/intent-filter&gt;
-		 * &lt;/receiver&gt;
+		 *	&lt;service
+		 *		android:name="com.cube.storm.message.lib.receiver.MessageReceiver"
+		 *		android:exported="false"
+		 *	&gt;
+		 *		&lt;intent-filter&gt;
+		 *			&lt;action android:name="com.google.android.c2dm.intent.RECEIVE" /&gt;
+		 *		&lt;/intent-filter&gt;
+		 *	&lt;/service&gt;
 		 * </pre>
 		 *
 		 * @param receiver The receiver to use
@@ -153,7 +178,7 @@ public class MessageSettings
 		 * to use correctly.
 		 * <p/>
 		 * <pre>
-		 * 	<service android:name="com.cube.storm.message.lib.service.TokenService" android:exported="false" />
+		 * 	&lt;service android:name="com.cube.storm.message.lib.service.TokenService" android:exported="false" /&gt;
 		 * </pre>
 		 *
 		 * @param tokenService The service to use
