@@ -16,7 +16,7 @@ import java.io.IOException;
  * This class registers the application for a GCM token. Must be defined in your Application manifest, and MessageSettings
  * class.
  * <pre>
- * 	<service android:name="com.cube.storm.message.lib.service.TokenService" android:exported="false" />
+ * 	&lt;service android:name="com.cube.storm.message.lib.service.TokenService" android:exported="false" /&gt;
  * </pre>
  * <pre>
  *	new MessageSettings.Builder(this)

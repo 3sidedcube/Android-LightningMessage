@@ -9,15 +9,15 @@ import com.google.android.gms.iid.InstanceIDListenerService;
  * This class listens for any token changes and re-calls the token service to fetch the new token. Should be registered
  * via your manifest. Not required, but recommended.
  * <pre>
- * 	<service
+ * 	&lt;service
  *		android:name="com.cube.storm.message.lib.service.TokenListenerService"
  *		android:exported="false"
- *	>
- *		<intent-filter>
- *			<action android:name="com.google.android.c2dm.intent.REGISTRATION" />
- *			<action android:name="com.google.android.gms.iid.InstanceID" />
- *		</intent-filter>
- *	</service>
+ *	&gt;
+ *		&lt;intent-filter&gt;
+ *			&lt;action android:name="com.google.android.c2dm.intent.REGISTRATION" /&gt;
+ *			&lt;action android:name="com.google.android.gms.iid.InstanceID" /&gt;
+ *		&lt;/intent-filter&gt;
+ *	&lt;/service&gt;
  * </pre>
  *
  * @author Callum Taylor
