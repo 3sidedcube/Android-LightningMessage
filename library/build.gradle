@@ -1,58 +1,33 @@
 apply plugin: 'com.android.library'
 
 android {
-	compileSdkVersion 21
-	buildToolsVersion "21.1.2"
+	compileSdkVersion 23
+	buildToolsVersion "23.0.3"
 
 	defaultConfig {
 		minSdkVersion 15
-		targetSdkVersion 21
+		targetSdkVersion 23
 	}
 
-	packagingOptions {
-		exclude 'META-INF/DEPENDENCIES.txt'
-		exclude 'META-INF/LICENSE.txt'
-		exclude 'META-INF/NOTICE.txt'
-		exclude 'META-INF/NOTICE'
-		exclude 'META-INF/LICENSE'
-		exclude 'META-INF/DEPENDENCIES'
-		exclude 'META-INF/notice.txt'
-		exclude 'META-INF/license.txt'
-		exclude 'META-INF/dependencies.txt'
-		exclude 'META-INF/LGPL2.1'
-		exclude 'LICENSE.txt'
-	}
-
-	android {
-		lintOptions {
-			abortOnError false
-		}
+	lintOptions {
+		abortOnError false
 	}
 }
 
 dependencies {
-	compile 'com.android.support:support-annotations:22.2.0'
-	compile 'com.android.support:support-v13:22.2.0'
-	compile 'org.projectlombok:lombok:1.14.8'
-	compile 'com.google.android.gms:play-services:7.5.0'
+	compile 'com.android.support:support-annotations:23.3.0'
+	compile 'com.android.support:support-v13:23.3.0'
+	compile 'org.projectlombok:lombok:1.16.8'
+	compile 'com.google.android.gms:play-services-gcm:8.4.0'
 
-	compile 'com.3sidedcube.storm:util:0.3-internal'
+	compile 'com.3sidedcube.storm:util:0.4.2'
 }
 
 def srcJava = 'src/main/java'
 def srcDelomboked = 'build/src-delomboked/main/java'
 
-task delombok {
-	inputs.files file(srcJava)
-	outputs.dir file(srcDelomboked)
-
-	doLast {
-		FileCollection collection = files(configurations.compile)
-		FileCollection sumTree = collection + fileTree(dir: 'bin')
-
-		ant.taskdef(name: 'delombok', classname: 'lombok.delombok.ant.DelombokTask', classpath: 'libs/lombok.jar')
-		ant.delombok(from:srcJava, to:srcDelomboked, classpath: sumTree.asPath)
-	}
+task delombok(type: Exec) {
+	commandLine 'java', '-jar', 'libs/lombok.jar', 'delombok', 'src', '-d', 'build/src-delomboked'
 }
 
 def findClasses(File path)
