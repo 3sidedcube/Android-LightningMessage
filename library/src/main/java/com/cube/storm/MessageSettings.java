@@ -36,7 +36,7 @@ public class MessageSettings
 	{
 		if (instance == null)
 		{
-			throw new IllegalAccessError("You must build the Ui settings object first using MessageSettings$Builder");
+			throw new IllegalAccessError("You must build the Message settings object first using MessageSettings$Builder");
 		}
 
 		return instance;
@@ -151,12 +151,14 @@ public class MessageSettings
 		 */
 		public MessageSettings build()
 		{
+			MessageSettings.instance = construct;
+
 			if (construct.receiver != null)
 			{
 				construct.receiver.register(context);
 			}
 
-			return (MessageSettings.instance = construct);
+			return construct;
 		}
 	}
 }
