@@ -88,5 +88,5 @@ android.libraryVariants.all { variant ->
 }
 
 //apply from: '../gradle/sonatype.gradle'
-//apply from: '../gradle/artifactory.gradle'
+apply from: '../gradle/artifactory.gradle'
 
