@@ -4,12 +4,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import com.cube.storm.message.lib.listener.RegisterListener;
 import com.cube.storm.message.lib.receiver.MessageReceiver;
 import com.cube.storm.message.lib.resolver.DefaultMessageResolver;
 import com.cube.storm.message.lib.resolver.MessageResolver;
 import com.cube.storm.message.lib.service.TokenService;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseOptions;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -204,9 +208,22 @@ public class MessageSettings
 		{
 			MessageSettings.instance = construct;
 
+			// initialise firebase
+			FirebaseApp.initializeApp(context, new FirebaseOptions.Builder()
+				.setApplicationId(context.getPackageName())
+				.setGcmSenderId(MessageSettings.getInstance().getProjectNumber())
+				.build());
+
 			if (construct.tokenService != null)
 			{
 				context.startService(new Intent(context, construct.tokenService));
+			}
+
+			// check if token already is registered
+			String token = FirebaseInstanceId.getInstance().getToken();
+			if (!TextUtils.isEmpty(token) && MessageSettings.getInstance().getRegisterListener() != null)
+			{
+				MessageSettings.getInstance().getRegisterListener().onDeviceRegistered(context, token);
 			}
 
 			return construct;
