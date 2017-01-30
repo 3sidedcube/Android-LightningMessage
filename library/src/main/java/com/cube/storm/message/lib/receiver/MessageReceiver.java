@@ -1,14 +1,15 @@
 package com.cube.storm.message.lib.receiver;
 
 import android.content.SharedPreferences;
-import android.os.Bundle;
 import android.preference.PreferenceManager;
 
 import com.cube.storm.MessageSettings;
 import com.cube.storm.message.lib.resolver.MessageResolver;
-import com.google.android.gms.gcm.GcmListenerService;
+import com.google.firebase.messaging.FirebaseMessagingService;
+import com.google.firebase.messaging.RemoteMessage;
 
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -24,7 +25,7 @@ import java.util.Set;
  *		android:exported="false"
  *	&gt;
  *		&lt;intent-filter&gt;
- *			&lt;action android:name="com.google.android.c2dm.intent.RECEIVE" /&gt;
+ *			&lt;action android:name="com.google.firebase.MESSAGING_EVENT" /&gt;
  *		&lt;/intent-filter&gt;
  *	&lt;/service&gt;
  * </pre>
@@ -32,7 +33,7 @@ import java.util.Set;
  * @author Callum Taylor
  * @project LightningMessage
  */
-public class MessageReceiver extends GcmListenerService
+public class MessageReceiver extends FirebaseMessagingService
 {
 	/**
 	 * List of previously sent notification IDs to prevent duplicates from being shown
@@ -44,12 +45,12 @@ public class MessageReceiver extends GcmListenerService
 	 */
 	public static final String TYPE_DEFAULT = "default";
 
-	@Override public void onMessageReceived(String from, Bundle data)
+	@Override public void onMessageReceived(RemoteMessage remoteMessage)
 	{
-		super.onMessageReceived(from, data);
+		super.onMessageReceived(remoteMessage);
 
-		String type = data.getString("type");
-		handleNotification(type, data);
+		String type = remoteMessage.getData().get("type");
+		handleNotification(type, remoteMessage.getData());
 	}
 
 	/**
@@ -60,7 +61,7 @@ public class MessageReceiver extends GcmListenerService
 	 *
 	 * @return True if the notification was handled, false if not
 	 */
-	public boolean handleNotification(String type, Bundle data)
+	public boolean handleNotification(String type, Map<String, String> data)
 	{
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
@@ -71,12 +72,12 @@ public class MessageReceiver extends GcmListenerService
 
 		if (data.containsKey("id"))
 		{
-			if (RECEIVED_IDS.contains(data.getString("id")))
+			if (RECEIVED_IDS.contains(data.get("id")))
 			{
 				return true;
 			}
 
-			RECEIVED_IDS.add(data.getString("id"));
+			RECEIVED_IDS.add(data.get("id"));
 		}
 
 		MessageResolver messageResolver = MessageSettings.getInstance().getMessageResolvers().get(type);
