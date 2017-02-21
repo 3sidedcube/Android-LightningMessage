@@ -203,16 +203,32 @@ public class MessageSettings
 		 * the receiver is not null.
 		 *
 		 * @return The newly set {@link com.cube.storm.MessageSettings} instance
+		 * @throws RuntimeException if the GcmSenderId option for the {@link FirebaseApp} is empty
 		 */
 		public MessageSettings build()
 		{
 			MessageSettings.instance = construct;
 
-			// initialise firebase
-			FirebaseApp.initializeApp(context, new FirebaseOptions.Builder()
-				.setApplicationId(context.getPackageName())
-				.setGcmSenderId(MessageSettings.getInstance().getProjectNumber())
-				.build());
+			FirebaseApp firebaseApp = FirebaseApp.getInstance();
+
+			if (firebaseApp == null)
+			{
+				// Initialise Firebase
+				FirebaseApp.initializeApp(context, new FirebaseOptions.Builder()
+					.setApplicationId(context.getPackageName())
+					.setGcmSenderId(MessageSettings.getInstance().getProjectNumber())
+					.build());
+			}
+			else
+			{
+				// Already has an instance of Firebase
+				FirebaseOptions options = firebaseApp.getOptions();
+
+				if (options == null || TextUtils.isEmpty(options.getGcmSenderId()))
+				{
+					throw new RuntimeException("Missing GcmSenderId from Firebase instance!");
+				}
+			}
 
 			if (construct.tokenService != null)
 			{
