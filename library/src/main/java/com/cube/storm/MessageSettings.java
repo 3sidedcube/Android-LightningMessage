@@ -209,25 +209,40 @@ public class MessageSettings
 		{
 			MessageSettings.instance = construct;
 
-			FirebaseApp firebaseApp = FirebaseApp.getInstance();
+			FirebaseApp firebaseApp = null;
+
+			try
+			{
+				firebaseApp = FirebaseApp.getInstance();
+			}
+			catch (Exception instanceException)
+			{
+				try
+				{
+					// Initialise Firebase
+					firebaseApp = FirebaseApp.initializeApp(context, new FirebaseOptions.Builder()
+						.setApplicationId(context.getPackageName())
+						.setGcmSenderId(MessageSettings.getInstance().getProjectNumber())
+						.build());
+				}
+				catch (Exception initialiseException)
+				{
+					instanceException.printStackTrace();
+					initialiseException.printStackTrace();
+				}
+			}
 
 			if (firebaseApp == null)
 			{
-				// Initialise Firebase
-				FirebaseApp.initializeApp(context, new FirebaseOptions.Builder()
-					.setApplicationId(context.getPackageName())
-					.setGcmSenderId(MessageSettings.getInstance().getProjectNumber())
-					.build());
+				throw new RuntimeException("Failed to initialise or reuse existing Firebase app");
 			}
-			else
-			{
-				// Already has an instance of Firebase
-				FirebaseOptions options = firebaseApp.getOptions();
 
-				if (options == null || TextUtils.isEmpty(options.getGcmSenderId()))
-				{
-					throw new RuntimeException("Missing GcmSenderId from Firebase instance!");
-				}
+			// Already has an instance of Firebase
+			FirebaseOptions options = firebaseApp.getOptions();
+
+			if (options == null || TextUtils.isEmpty(options.getGcmSenderId()))
+			{
+				throw new RuntimeException("Missing GcmSenderId from Firebase instance!");
 			}
 
 			if (construct.tokenService != null)
