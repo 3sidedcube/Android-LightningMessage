@@ -7,24 +7,24 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 
 import com.cube.storm.message.R;
 
+import java.util.Map;
 import java.util.Random;
 
 /**
- * Class for resolving and handling messages sent via GCM
+ * Class for resolving and handling messages sent via Firebase
  *
  * @author Callum Taylor
  * @project LightningMessage
  */
 public class DefaultMessageResolver extends MessageResolver
 {
-	public boolean resolve(Context context, Bundle data)
+	public boolean resolve(Context context, Map<String, String> data)
 	{
-		String message = data.getString("message");
+		String message = data.get("message");
 
 		NotificationCompat.BigTextStyle style = new NotificationCompat.BigTextStyle();
 		style.bigText(message);
