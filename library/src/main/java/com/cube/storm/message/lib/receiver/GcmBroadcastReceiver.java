@@ -17,11 +17,9 @@ import com.cube.storm.MessageSettings;
  * &lt;receiver
  * 		android:name="com.cube.storm.message.lib.receiver.GcmBroadcastReceiver"
  * 		android:exported="true"
- * 		android:permission="com.google.android.c2dm.permission.SEND"
  * &gt;
  * 		&lt;intent-filter&gt;
- * 			&lt;action android:name="com.google.android.c2dm.intent.RECEIVE" /&gt;
- * 			&lt;category android:name="com.cube.storm.message.example" /&gt;
+ * 			&lt;action android:name="com.google.firebase.MESSAGING_EVENT" /&gt;
  * 		&lt;/intent-filter&gt;
  * &lt;/receiver&gt;
  * </pre>

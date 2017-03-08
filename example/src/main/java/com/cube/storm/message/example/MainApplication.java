@@ -2,11 +2,12 @@ package com.cube.storm.message.example;
 
 import android.app.Application;
 import android.content.Context;
-import android.os.Bundle;
 import android.util.Log;
 
 import com.cube.storm.MessageSettings;
 import com.cube.storm.message.lib.resolver.MessageResolver;
+
+import java.util.Map;
 
 /**
  * // TODO: Add class description
@@ -24,7 +25,7 @@ public class MainApplication extends Application
 			.projectNumber("")
 			.registerMessageResolver("test", new MessageResolver()
 			{
-				@Override public boolean resolve(Context context, Bundle data)
+				@Override public boolean resolve(Context context, Map<String, String> data)
 				{
 					Log.e("MESSAGE", "Test Message received");
 					return false;

@@ -4,12 +4,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import com.cube.storm.message.lib.listener.RegisterListener;
 import com.cube.storm.message.lib.receiver.MessageReceiver;
 import com.cube.storm.message.lib.resolver.DefaultMessageResolver;
 import com.cube.storm.message.lib.resolver.MessageResolver;
 import com.cube.storm.message.lib.service.TokenService;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseOptions;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -199,14 +203,58 @@ public class MessageSettings
 		 * the receiver is not null.
 		 *
 		 * @return The newly set {@link com.cube.storm.MessageSettings} instance
+		 * @throws RuntimeException if the GcmSenderId option for the {@link FirebaseApp} is empty
 		 */
 		public MessageSettings build()
 		{
 			MessageSettings.instance = construct;
 
+			FirebaseApp firebaseApp = null;
+
+			try
+			{
+				firebaseApp = FirebaseApp.getInstance();
+			}
+			catch (Exception instanceException)
+			{
+				try
+				{
+					// Initialise Firebase
+					firebaseApp = FirebaseApp.initializeApp(context, new FirebaseOptions.Builder()
+						.setApplicationId(context.getPackageName())
+						.setGcmSenderId(MessageSettings.getInstance().getProjectNumber())
+						.build());
+				}
+				catch (Exception initialiseException)
+				{
+					instanceException.printStackTrace();
+					initialiseException.printStackTrace();
+				}
+			}
+
+			if (firebaseApp == null)
+			{
+				throw new RuntimeException("Failed to initialise or reuse existing Firebase app");
+			}
+
+			// Already has an instance of Firebase
+			FirebaseOptions options = firebaseApp.getOptions();
+
+			if (options == null || TextUtils.isEmpty(options.getGcmSenderId()))
+			{
+				throw new RuntimeException("Missing GcmSenderId from Firebase instance!");
+			}
+
 			if (construct.tokenService != null)
 			{
 				context.startService(new Intent(context, construct.tokenService));
+			}
+
+			// check if token already is registered
+			String token = FirebaseInstanceId.getInstance().getToken();
+			if (!TextUtils.isEmpty(token) && MessageSettings.getInstance().getRegisterListener() != null)
+			{
+				MessageSettings.getInstance().getRegisterListener().onDeviceRegistered(context, token);
 			}
 
 			return construct;
