@@ -1,7 +1,5 @@
 package com.cube.storm.message.lib.service;
 
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.text.TextUtils;
 
 import com.cube.storm.MessageSettings;
@@ -35,10 +33,6 @@ public class TokenService extends FirebaseInstanceIdService
 		}
 
 		String token = FirebaseInstanceId.getInstance().getToken();
-
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-		prefs.edit().putString("push_id", token).putLong("push_id_time", System.currentTimeMillis()).apply();
-
 		onTokenReceived(token);
 	}
 

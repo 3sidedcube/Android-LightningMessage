@@ -6,15 +6,25 @@ buildscript {
 	}
 
 	dependencies {
-		classpath 'com.android.tools.build:gradle:2.2.3'
+		classpath 'com.android.tools.build:gradle:2.3.1'
 	}
 }
 
 allprojects {
 	repositories {
 		jcenter()
+		maven { url "https://maven.google.com" }
+
 		maven {
 			url 'http://oss.3sidedcube.com:8081/artifactory/internal'
+		}
+
+		maven {
+			credentials {
+				username "$ARTIFACTORY_USERNAME"
+				password "$ARTIFACTORY_PASSWORD"
+			}
+			url 'http://oss.3sidedcube.com:8081/artifactory/private'
 		}
 	}
 }
