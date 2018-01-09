@@ -2,6 +2,7 @@ package com.cube.storm;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -247,7 +248,10 @@ public class MessageSettings
 
 			if (construct.tokenService != null)
 			{
-				context.startService(new Intent(context, construct.tokenService));
+				if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O)
+				{
+					context.startService(new Intent(context, construct.tokenService));
+				}
 			}
 
 			// check if token already is registered
