@@ -80,11 +80,18 @@ public class MessageReceiver extends FirebaseMessagingService
 			RECEIVED_IDS.add(data.get("id"));
 		}
 
-		MessageResolver messageResolver = MessageSettings.getInstance().getMessageResolvers().get(type);
-
-		if (messageResolver != null)
+		try
 		{
-			return messageResolver.resolve(getApplicationContext(), data);
+			MessageResolver messageResolver = MessageSettings.getInstance().getMessageResolvers().get(type);
+
+			if (messageResolver != null)
+			{
+				return messageResolver.resolve(getApplicationContext(), data);
+			}
+		}
+		catch (IllegalAccessError iar)
+		{
+			return false;
 		}
 
 		return false;
