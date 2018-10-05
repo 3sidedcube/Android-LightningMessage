@@ -2,7 +2,7 @@ package com.cube.storm.message.lib.receiver;
 
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-
+import android.text.TextUtils;
 import com.cube.storm.MessageSettings;
 import com.cube.storm.message.lib.resolver.MessageResolver;
 import com.google.firebase.messaging.FirebaseMessagingService;
@@ -95,5 +95,21 @@ public class MessageReceiver extends FirebaseMessagingService
 		}
 
 		return false;
+	}
+
+	@Override
+	public void onNewToken(String s)
+	{
+		super.onNewToken(s);
+
+		if (TextUtils.isEmpty(MessageSettings.getInstance().getProjectNumber()))
+		{
+			throw new IllegalArgumentException("Project number can not be empty");
+		}
+
+		if (MessageSettings.getInstance().getRegisterListener() != null)
+		{
+			MessageSettings.getInstance().getRegisterListener().onDeviceRegistered(this, s);
+		}
 	}
 }

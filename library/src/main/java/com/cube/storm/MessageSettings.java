@@ -1,26 +1,21 @@
 package com.cube.storm;
 
 import android.content.Context;
-import android.content.Intent;
-import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
-
 import com.cube.storm.message.lib.listener.RegisterListener;
 import com.cube.storm.message.lib.receiver.MessageReceiver;
 import com.cube.storm.message.lib.resolver.DefaultMessageResolver;
 import com.cube.storm.message.lib.resolver.MessageResolver;
-import com.cube.storm.message.lib.service.TokenService;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.iid.FirebaseInstanceId;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import lombok.Getter;
-import lombok.Setter;
 
 /**
  * This is the entry point class of the library. To enable the use of the library, you must instantiate
@@ -80,11 +75,6 @@ public class MessageSettings
 	@Getter private Map<String, MessageResolver> messageResolvers = new HashMap<>();
 
 	/**
-	 * The broadcast receiver class for receiving new tokens. Should be the same as defined in the application manifest
-	 */
-	@Getter @Setter private Class<? extends TokenService> tokenService;
-
-	/**
 	 * The builder class for {@link com.cube.storm.MessageSettings}. Use this to create a new {@link com.cube.storm.MessageSettings} instance
 	 * with the customised properties specific for your project.
 	 *
@@ -110,7 +100,6 @@ public class MessageSettings
 			registerMessageResolver(MessageReceiver.TYPE_DEFAULT, new DefaultMessageResolver());
 
 			messageReceiver(new MessageReceiver());
-			tokenService(TokenService.class);
 		}
 
 		/**
@@ -179,24 +168,6 @@ public class MessageSettings
 		}
 
 		/**
-		 * Sets the service for getting the GCM token for the module. You must also set this in your manifest for the framework
-		 * to use correctly.
-		 * <p/>
-		 * <pre>
-		 * 	&lt;service android:name="com.cube.storm.message.lib.service.TokenService" android:exported="false" /&gt;
-		 * </pre>
-		 *
-		 * @param tokenService The service to use
-		 *
-		 * @return The builder to allow for chaining
-		 */
-		public Builder tokenService(@NonNull Class<? extends TokenService> tokenService)
-		{
-			construct.tokenService = tokenService;
-			return this;
-		}
-
-		/**
 		 * Builds the final settings object and sets its instance. Use {@link #getInstance()} to retrieve the settings
 		 * instance.
 		 * <p/>
@@ -244,14 +215,6 @@ public class MessageSettings
 			if (options == null || TextUtils.isEmpty(options.getGcmSenderId()))
 			{
 				throw new RuntimeException("Missing GcmSenderId from Firebase instance!");
-			}
-
-			if (construct.tokenService != null)
-			{
-				if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O)
-				{
-					context.startService(new Intent(context, construct.tokenService));
-				}
 			}
 
 			// check if token already is registered
