@@ -33,7 +33,7 @@ import java.util.Set;
  * @author Callum Taylor
  * @project LightningMessage
  */
-public class MessageReceiver extends FirebaseMessagingService
+public class MessageReceiver
 {
 	/**
 	 * List of previously sent notification IDs to prevent duplicates from being shown
@@ -44,14 +44,6 @@ public class MessageReceiver extends FirebaseMessagingService
 	 * Default notification type with a simple message
 	 */
 	public static final String TYPE_DEFAULT = "default";
-
-	@Override public void onMessageReceived(RemoteMessage remoteMessage)
-	{
-		super.onMessageReceived(remoteMessage);
-
-		String type = remoteMessage.getData().get("type");
-		handleNotification(type, remoteMessage.getData());
-	}
 
 	/**
 	 * Implement this to handle the notifications sent from the server
@@ -95,21 +87,5 @@ public class MessageReceiver extends FirebaseMessagingService
 		}
 
 		return false;
-	}
-
-	@Override
-	public void onNewToken(String s)
-	{
-		super.onNewToken(s);
-
-		if (TextUtils.isEmpty(MessageSettings.getInstance().getProjectNumber()))
-		{
-			throw new IllegalArgumentException("Project number can not be empty");
-		}
-
-		if (MessageSettings.getInstance().getRegisterListener() != null)
-		{
-			MessageSettings.getInstance().getRegisterListener().onDeviceRegistered(this, s);
-		}
 	}
 }

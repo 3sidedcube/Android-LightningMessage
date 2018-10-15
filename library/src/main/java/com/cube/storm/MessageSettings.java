@@ -3,14 +3,9 @@ package com.cube.storm;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
-import com.cube.storm.message.lib.listener.RegisterListener;
 import com.cube.storm.message.lib.receiver.MessageReceiver;
 import com.cube.storm.message.lib.resolver.DefaultMessageResolver;
 import com.cube.storm.message.lib.resolver.MessageResolver;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.FirebaseOptions;
-import com.google.firebase.iid.FirebaseInstanceId;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -55,16 +50,6 @@ public class MessageSettings
 	private MessageSettings(){}
 
 	/**
-	 * Project number as defined in the Google console project page under "project number"
-	 */
-	@Getter @Setter private String projectNumber;
-
-	/**
-	 * Callback used once the device has been registered for a push token
-	 */
-	@Getter @Setter private RegisterListener registerListener;
-
-	/**
 	 * The gcm receiver class used to receive messages from Storm.
 	 */
 	@Getter @Setter private MessageReceiver receiver;
@@ -87,45 +72,16 @@ public class MessageSettings
 		 */
 		private MessageSettings construct;
 
-		private Context context;
-
 		/**
 		 * Default constructor
 		 */
-		public Builder(@NonNull Context context)
+		public Builder()
 		{
 			this.construct = new MessageSettings();
-			this.context = context.getApplicationContext();
 
 			registerMessageResolver(MessageReceiver.TYPE_DEFAULT, new DefaultMessageResolver());
 
 			messageReceiver(new MessageReceiver());
-		}
-
-		/**
-		 * Sets the project number from the console
-		 *
-		 * @param projectNumber The project number
-		 *
-		 * @return The builder to allow for chaining
-		 */
-		public Builder projectNumber(@NonNull String projectNumber)
-		{
-			construct.projectNumber = projectNumber;
-			return this;
-		}
-
-		/**
-		 * Sets the callback listener for when the device has been registered for a push token
-		 *
-		 * @param listener The listener to use
-		 *
-		 * @return The builder to allow for chaining
-		 */
-		public Builder registerListener(@Nullable RegisterListener listener)
-		{
-			construct.registerListener = listener;
-			return this;
 		}
 
 		/**
@@ -175,55 +131,10 @@ public class MessageSettings
 		 * the receiver is not null.
 		 *
 		 * @return The newly set {@link com.cube.storm.MessageSettings} instance
-		 * @throws RuntimeException if the GcmSenderId option for the {@link FirebaseApp} is empty
 		 */
 		public MessageSettings build()
 		{
 			MessageSettings.instance = construct;
-
-			FirebaseApp firebaseApp = null;
-
-			try
-			{
-				firebaseApp = FirebaseApp.getInstance();
-			}
-			catch (Exception instanceException)
-			{
-				try
-				{
-					// Initialise Firebase
-					firebaseApp = FirebaseApp.initializeApp(context, new FirebaseOptions.Builder()
-						.setApplicationId(context.getPackageName())
-						.setGcmSenderId(MessageSettings.getInstance().getProjectNumber())
-						.build());
-				}
-				catch (Exception initialiseException)
-				{
-					instanceException.printStackTrace();
-					initialiseException.printStackTrace();
-				}
-			}
-
-			if (firebaseApp == null)
-			{
-				throw new RuntimeException("Failed to initialise or reuse existing Firebase app");
-			}
-
-			// Already has an instance of Firebase
-			FirebaseOptions options = firebaseApp.getOptions();
-
-			if (options == null || TextUtils.isEmpty(options.getGcmSenderId()))
-			{
-				throw new RuntimeException("Missing GcmSenderId from Firebase instance!");
-			}
-
-			// check if token already is registered
-			String token = FirebaseInstanceId.getInstance().getToken();
-			if (!TextUtils.isEmpty(token) && MessageSettings.getInstance().getRegisterListener() != null)
-			{
-				MessageSettings.getInstance().getRegisterListener().onDeviceRegistered(context, token);
-			}
-
 			return construct;
 		}
 	}
