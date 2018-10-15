@@ -6,7 +6,6 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
-
 import com.cube.storm.message.lib.listener.RegisterListener;
 import com.cube.storm.message.lib.receiver.MessageReceiver;
 import com.cube.storm.message.lib.resolver.DefaultMessageResolver;
@@ -15,12 +14,11 @@ import com.cube.storm.message.lib.service.TokenService;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.iid.FirebaseInstanceId;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import lombok.Getter;
-import lombok.Setter;
 
 /**
  * This is the entry point class of the library. To enable the use of the library, you must instantiate
@@ -53,11 +51,6 @@ public class MessageSettings
 
 		return instance;
 	}
-
-	/**
-	 * Default private constructor
-	 */
-	private MessageSettings(){}
 
 	/**
 	 * Project number as defined in the Google console project page under "project number"
