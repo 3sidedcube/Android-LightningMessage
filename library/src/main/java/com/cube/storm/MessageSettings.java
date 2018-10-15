@@ -53,11 +53,6 @@ public class MessageSettings
 	}
 
 	/**
-	 * Default private constructor
-	 */
-	private MessageSettings(){}
-
-	/**
 	 * Project number as defined in the Google console project page under "project number"
 	 */
 	@Getter @Setter private String projectNumber;
